@@ -46,9 +46,9 @@ float compara(const void *a, const void *b, int prof){
 }
 
 void ler_cidades(reg* preg, arv **parv){
-	FILE *ptrarq; 
+	FILE *ptrarq;
 	//no* raiz = (*parv)->r;
-	
+
 	ptrarq = fopen("municipios.csv", "r");
 	int result;
 	char nome[100];
@@ -59,14 +59,15 @@ void ler_cidades(reg* preg, arv **parv){
 
 	else{
 		char indice[1000];
-		char lixo;	
-		int i = 0;	
+		char lixo;
+		int i = 0;
 		printf("%s\n", indice);
-		preg = (reg*) malloc(sizeof(reg)); //total de cidades
+		preg = (reg*) malloc(sizeof(reg)*5570); //total de cidades
 		result = fscanf(ptrarq, " %[^\n]", indice);
-		while((result = fscanf(ptrarq, "%d", &preg->codIBGE)) != EOF){
+		while((result = fscanf(ptrarq, "%d", &preg[i].codIBGE)) != EOF){
 			result = fscanf(ptrarq, "%c", &lixo);
-			reg *cidade = preg;
+			reg *cidade;
+			cidade = &(preg[i]);
 			printf("%d\n", cidade->codIBGE);
 			printf("%c\n", lixo);
 
@@ -103,86 +104,40 @@ void ler_cidades(reg* preg, arv **parv){
 			printf("%s\n", cidade->fuso);
 
 			insere(*parv, cidade);
-
-			
+			reg* registro = (reg*)((*parv)->r->reg);
+            printf("%s", registro->nome);
+            i++;
 		}
 
 	}
 
     fclose(ptrarq);
-    free(preg);
 
 }
 
-arv* teste_constroi(){
-	
-	arv* ptr;
+/*arv* teste_constroi(){
 
+	arv* ptr;
+	ptr = NULL;
 	ptr = constroi(ptr);
 	printf("aqui\n");
-		
 
-	assert(ptr->r == NULL); /*teste inicialização da árvore*/
+
+	assert(ptr->r == NULL); teste inicialização da árvore
 	return ptr;
-}
-
-/*void teste_inserir(arv **parv, reg *preg, int n){
-	no* raiz = (*parv)->r;
-	reg* cidade;
-	int i;
-	for(i = 0; i < n; i++){
-		cidade = &(preg[i]);
-		insere(*parv, cidade);
-		printf("i =%d\n", i);
-	}
-
-
-	/*reg *preg, *preg1, *preg2, *preg3;
-	
-
-	preg = (reg*) malloc(sizeof(reg));
-	preg->lat = -12.9551;
-	preg->longt = -60.8947;
-	strcpy(preg->nome, "Corumbiara");
-	assert(strcmp(preg->nome, "Corumbiara") == 0);
-	insere(*parv, preg);
-	assert(compara((*parv)->r->reg, preg, 0) == 0); 
-
-	
-	preg1 = (reg*) malloc(sizeof(reg));
-	preg1->lat = -26.9155;
-	preg1->longt = -49.0709;
-	strcpy(preg1->nome, "Blumenau");
-	insere((*parv), preg1);
-
-	preg2 = (reg*) malloc(sizeof(reg));
-	preg2->lat = -24.2868;
-	preg2->longt = -53.8404;
-	strcpy(preg2->nome, "Palotina");
-	insere(*parv, preg2);
-
-	preg3 = (reg*) malloc(sizeof(reg));
-	preg3->lat = -4.88161;
-	preg3->longt = -64.3953;
-	strcpy(preg3->nome, "Canutama");
-	insere(*parv, preg3);
-
-	assert(raiz->esq->esq == NULL);
-	assert(raiz->dir->esq == NULL);
-	assert(compara(raiz->reg, preg, 0) == 0);
-	assert(compara(raiz->dir->reg, preg2, 1) == -1);*/
+}*/
 
 
 void teste_def_sucessor(arv *parv){
 	/*teste função defineSucessor*/
-	no* p = defineSucessor(parv, parv->r);
+	no* p = defineSucessor(parv->r);
 	assert(compara(p->reg, parv->r->dir->reg, 1)==0);
 	assert(compara(p->reg, parv->r->dir->reg, 0)==0);
 }
 
 void teste_def_predecessor(arv *parv){
 	/*teste função definePredecessor*/
-	no* p = definePredecessor(parv, parv->r);
+	no* p = definePredecessor(parv->r);
 	assert(compara(p->reg, parv->r->esq->reg, 1)==0);
 	assert(compara(p->reg, parv->r->esq->reg, 0)==0);
 }
@@ -192,37 +147,32 @@ void teste_destroi(arv **parv){
 	assert((*parv)->r == NULL);
 }
 
-int main(){
+void cidadesControler(){
 	reg *preg;
-	no *noBusca;
 	arv *parv;
-	parv = teste_constroi();
-	printf("aquiii\n");
-	
+	preg = NULL;
+	constroi(&parv);
+	no* noBusca;
+	noBusca = parv->r;
 	ler_cidades(preg, &parv);
-	
-	/*registro = (reg*)(parv->r->reg);
-	preg = (reg*)(parv->r->esq->reg);
 
-	printf("%d\n",registro->codIBGE);
-	printf("%d\n",preg->codIBGE);*/
 	float longCidade, latCidade;
 
-	printf("Digite o código do IBGE da cidade para localizar seu vizinho próximo:\n");
+	printf("Digite a latitude do município para localizar seu vizinho próximo:\n");
 	scanf("%f", &latCidade);
+	printf("Digite a longitude do município para localizar seu vizinho próximo:\n");
 	scanf("%f", &longCidade);
 
-	preg = (reg*) malloc(sizeof(reg));	
+	preg = (reg*) malloc(sizeof(reg));
 	preg->longt = longCidade;
 	preg->lat = latCidade;
 
 	noBusca = busca(parv, preg);
-	//no* resultado = defineSucessor(parv, noBusca);
+	no* resultado = defineSucessor(noBusca);
 
-	/*reg* registro;
+	reg* registro;
 	registro = (reg*)(resultado->reg);
 	printf("%s\n", registro->nome);
 
 
-}*/
 }
